@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,23 +7,52 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div class="player-bg" aria-hidden="true"></div>
+
     <div class="music-player">
-        <h1>Music Player</h1>
-        <audio id="audio" controls></audio>
-        <div class="controls">
-            <button id="prev">Previous</button>
-            <button id="play">Play</button>
-            <button id="next">Next</button>
-        </div>
-        <div class="progress-container">
-            <div class="progress-bar" id="progress-bar"></div>
-        </div>
-        <div class="volume-container">
-            <label for="volume">Volume:</label>
-            <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
-        </div>
-        <ul id="playlist"></ul>
+        <header class="mp-header">
+            <div class="branding">
+                <div class="thumb-wrap"><img id="albumArt" src="" alt="Album art"></div>
+                <div class="titles">
+                    <div id="currentTitle">Music Player</div>
+                    <div id="currentArtist" class="sub">Your playlist</div>
+                </div>
+            </div>
+            <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">🌓</button>
+        </header>
+
+        <main class="mp-main">
+            <div class="cover">
+                <img id="coverArt" src="" alt="Cover art">
+            </div>
+
+            <audio id="audio"></audio>
+
+            <div class="controls">
+                <button id="prev" title="Previous">⏮</button>
+                <button id="play" title="Play">▶</button>
+                <button id="next" title="Next">⏭</button>
+            </div>
+
+            <div class="progress-row">
+                <span id="currentTime">0:00</span>
+                <div id="progress-container" class="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                </div>
+                <span id="duration">0:00</span>
+            </div>
+
+            <div class="volume-container">
+                <label for="volume">Volume</label>
+                <input type="range" id="volume" min="0" max="1" step="0.01" value="1">
+            </div>
+
+            <ul id="playlist" class="playlist"></ul>
+        </main>
+
+        <footer class="mp-footer">Built with ♥ — Your local player</footer>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>

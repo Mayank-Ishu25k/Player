@@ -109,6 +109,12 @@ const volumeSlider = document.getElementById('volume');
 const playlist = document.getElementById('playlist');
 const currentTitle = document.getElementById('currentTitle');
 const albumArt = document.getElementById('albumArt');
+const coverArt = document.getElementById('coverArt');
+const progressContainer = document.getElementById('progress-container');
+const currentTimeEl = document.getElementById('currentTime');
+const durationEl = document.getElementById('duration');
+const themeToggle = document.getElementById('themeToggle');
+const playerBg = document.querySelector('.player-bg');
 
 // Songs (you can add album arts)
 const songs = [
@@ -128,7 +134,14 @@ function loadPlaylist() {
     playlist.innerHTML = '';
     songs.forEach((song, index) => {
         const li = document.createElement('li');
-        li.textContent = song.title;
+        const thumb = document.createElement('div');
+        thumb.className = 'p-thumb';
+        thumb.style.backgroundImage = `url(${song.art})`;
+        const title = document.createElement('div');
+        title.className = 'p-title';
+        title.textContent = song.title;
+        li.appendChild(thumb);
+        li.appendChild(title);
         li.addEventListener('click', () => playSong(index));
         playlist.appendChild(li);
     });
@@ -142,6 +155,8 @@ function playSong(index) {
 
     currentTitle.textContent = songs[index].title;
     albumArt.src = songs[index].art;
+    coverArt.src = songs[index].art;
+    setBackground(songs[index].art);
 
     updateActiveSong();
     playBtn.textContent = "⏸";
@@ -180,15 +195,22 @@ prevBtn.addEventListener('click', () => {
 
 // Update progress bar
 audio.addEventListener('timeupdate', () => {
+    if (!isFinite(audio.duration)) return;
     const progress = (audio.currentTime / audio.duration) * 100;
     progressBar.style.width = progress + '%';
+    currentTimeEl.textContent = formatTime(audio.currentTime);
+});
+
+audio.addEventListener('loadedmetadata', () => {
+    if (isFinite(audio.duration)) durationEl.textContent = formatTime(audio.duration);
 });
 
 // Seek
-document.querySelector('.progress-container').addEventListener('click', (e) => {
-    const width = e.target.clientWidth;
-    const clickX = e.offsetX;
-    audio.currentTime = (clickX / width) * audio.duration;
+progressContainer.addEventListener('click', (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const width = rect.width;
+    if (isFinite(audio.duration)) audio.currentTime = (clickX / width) * audio.duration;
 });
 
 // Volume
@@ -205,3 +227,33 @@ audio.addEventListener('ended', () => {
 loadPlaylist();
 updateActiveSong();
 currentTitle.textContent = songs[0].title;
+albumArt.src = songs[0].art;
+coverArt.src = songs[0].art;
+setBackground(songs[0].art);
+
+// Theme toggle: persist in localStorage
+function setTheme(theme){
+    if(theme === 'light') document.body.classList.add('light');
+    else document.body.classList.remove('light');
+    localStorage.setItem('theme', theme);
+}
+
+themeToggle.addEventListener('click', () => {
+    const isLight = document.body.classList.toggle('light');
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+});
+
+const savedTheme = localStorage.getItem('theme') || 'dark';
+setTheme(savedTheme);
+
+function setBackground(url){
+    if(!url) return;
+    playerBg.style.backgroundImage = `url(${url})`;
+}
+
+function formatTime(t){
+    if (!isFinite(t)) return '0:00';
+    const mm = Math.floor(t/60);
+    const ss = Math.floor(t%60).toString().padStart(2,'0');
+    return `${mm}:${ss}`;
+}
